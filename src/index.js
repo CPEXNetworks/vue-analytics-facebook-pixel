@@ -5,26 +5,24 @@
  * @type {Object}
  */
 let config = {
-  appId: "",
+  appId: '',
   debug: false,
   excludes: []
-};
+}
 
 // Private functions
 
 const _fbqEnabled = () => {
-  if (typeof window.fbq === "undefined") {
+  if (typeof window.fbq === 'undefined') {
     if (config.debug) {
-      console.log(
-        "[Vue Facebook Pixel]: `window.fbq` is not defined, skipping"
-      );
+      console.log('[Vue Facebook Pixel]: `window.fbq` is not defined, skipping')
     }
 
-    return false;
+    return false
   }
 
-  return true;
-};
+  return true
+}
 
 // Public functions
 
@@ -34,16 +32,16 @@ const _fbqEnabled = () => {
  * @param  {object} [data={}]
  */
 const init = (appId, data = {}) => {
-  if (!_fbqEnabled()) return;
+  if (!_fbqEnabled()) return
 
-  config.appId = appId;
+  config.appId = appId
 
   if (config.debug) {
-    console.log(`[Vue Facebook Pixel] Initializing app ${appId}`);
+    console.log(`[Vue Facebook Pixel] Initializing app ${appId}`)
   }
 
-  query("init", appId, data);
-};
+  query('init', appId, data)
+}
 
 /**
  * Event tracking
@@ -51,16 +49,16 @@ const init = (appId, data = {}) => {
  * @param  {object} [data={}]
  */
 const event = (name, data = {}) => {
-  if (!_fbqEnabled()) return;
+  if (!_fbqEnabled()) return
 
   if (config.debug) {
-    console.groupCollapsed(`[Vue Facebook Pixel] Track event "${name}"`);
-    console.log(`With data: ${data}`);
-    console.groupEnd();
+    console.groupCollapsed(`[Vue Facebook Pixel] Track event '${name}'`)
+    console.log(`With data: ${data}`)
+    console.groupEnd()
   }
 
-  query("trackSingle", config.appId, name, data);
-};
+  query('trackSingle', config.appId, name, data)
+}
 
 /**
  * Submit a raw query to fbq, for when the wrapper limits user on what they need.
@@ -68,16 +66,16 @@ const event = (name, data = {}) => {
  * @param mixed ...args
  */
 const query = (...args) => {
-  if (!_fbqEnabled()) return;
+  if (!_fbqEnabled()) return
 
   if (config.debug) {
-    console.groupCollapsed(`[Vue Facebook Pixel] Raw query`);
-    console.log(`With data: `, ...args);
-    console.groupEnd();
+    console.groupCollapsed(`[Vue Facebook Pixel] Raw query`)
+    console.log(`With data: `, ...args)
+    console.groupEnd()
   }
 
-  window.fbq(...args);
-};
+  window.fbq(...args)
+}
 
 /**
  * Vue installer
@@ -86,19 +84,19 @@ const query = (...args) => {
  */
 const install = (Vue, options = {}) => {
   //
-  const { router, debug, excludeRoutes } = options;
+  const { router, debug, excludeRoutes } = options
 
-  config.excludes = excludeRoutes || config.excludes;
-  config.debug = !!debug;
+  config.excludes = excludeRoutes || config.excludes
+  config.debug = !!debug
 
   // These objects may contain different providers as well,
   // or might be empty:
   if (!Vue.analytics) {
-    Vue.analytics = {};
+    Vue.analytics = {}
   }
 
   if (!Vue.prototype.$analytics) {
-    Vue.prototype.$analytics = {};
+    Vue.prototype.$analytics = {}
   }
 
   // Setting values for both Vue and component instances
@@ -106,21 +104,21 @@ const install = (Vue, options = {}) => {
   // 1. `Vue.analytics.fbq.init()`
   // 2. `this.$analytics.fbq.init()`
 
-  Vue.analytics.fbq = { init, event, query };
-  Vue.prototype.$analytics.fbq = { init, event, query };
+  Vue.analytics.fbq = { init, event, query }
+  Vue.prototype.$analytics.fbq = { init, event, query }
 
   // Support for Vue-Router:
   if (router) {
-    const { excludes } = config;
+    const { excludes } = config
 
     router.afterEach(({ path, name }) => {
       if (excludes.length && excludes.indexOf(name) !== -1) {
-        return;
+        return
       }
 
-      Vue.analytics.fbq.event("PageView");
-    });
+      Vue.analytics.fbq.event('PageView')
+    })
   }
-};
+}
 
-export default { install };
+export default { install }
