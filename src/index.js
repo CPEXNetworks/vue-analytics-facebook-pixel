@@ -5,6 +5,7 @@
  * @type {Object}
  */
 let config = {
+  appId: "",
   debug: false,
   excludes: []
 };
@@ -35,6 +36,8 @@ const _fbqEnabled = () => {
 const init = (appId, data = {}) => {
   if (!_fbqEnabled()) return;
 
+  config.appId = appId;
+
   if (config.debug) {
     console.log(`[Vue Facebook Pixel] Initializing app ${appId}`);
   }
@@ -56,7 +59,7 @@ const event = (name, data = {}) => {
     console.groupEnd();
   }
 
-  query("track", name, data);
+  query("trackSingle", config.appId, name, data);
 };
 
 /**
