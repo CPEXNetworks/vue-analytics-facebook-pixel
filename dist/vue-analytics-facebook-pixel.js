@@ -68,7 +68,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 
 	var config = {
-	  appId: '',
 	  debug: false,
 	  excludes: []
 	};
@@ -90,7 +89,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  if (!_fbqEnabled()) return;
 
-	  config.appId = appId;
+	  window.fbqPixelId = appId;
 
 	  if (config.debug) {
 	    console.log('[Vue Facebook Pixel] Initializing app ' + appId);
@@ -110,7 +109,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    console.groupEnd();
 	  }
 
-	  query('trackSingle', config.appId, name, data);
+	  if (window.fbqPixelId) {
+	    query('trackSingle', window.fbqPixelId, name, data);
+	  }
 	};
 
 	var query = function query() {
@@ -129,7 +130,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    (_console = console).log.apply(_console, ['With data: '].concat(args));
 	    console.groupEnd();
 	  }
-
 	  (_window = window).fbq.apply(_window, args);
 	};
 
@@ -137,7 +137,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	  var router = options.router,
 	      debug = options.debug,
-	      excludeRoutes = options.excludeRoutes;
+	      excludeRoutes = options.excludeRoutes,
+	      appId = options.appId;
 
 
 	  config.excludes = excludeRoutes || config.excludes;
@@ -153,6 +154,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  Vue.analytics.fbq = { init: init, event: event, query: query };
 	  Vue.prototype.$analytics.fbq = { init: init, event: event, query: query };
+
+	  if (appId) {
+	    Vue.analytics.fbq.init(appId);
+	  }
 
 	  if (router) {
 	    var excludes = config.excludes;
