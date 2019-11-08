@@ -5,7 +5,6 @@
  * @type {Object}
  */
 let config = {
-  appId: '',
   debug: false,
   excludes: []
 }
@@ -34,7 +33,7 @@ const _fbqEnabled = () => {
 const init = (appId, data = {}) => {
   if (!_fbqEnabled()) return
 
-  config.appId = appId
+  window.fbqPixelId = appId
 
   if (config.debug) {
     console.log(`[Vue Facebook Pixel] Initializing app ${appId}`)
@@ -57,7 +56,9 @@ const event = (name, data = {}) => {
     console.groupEnd()
   }
 
-  query('trackSingle', config.appId, name, data)
+  if (window.fbqPixelId) {
+    query('trackSingle', window.fbqPixelId, name, data)
+  }
 }
 
 /**
@@ -73,7 +74,6 @@ const query = (...args) => {
     console.log(`With data: `, ...args)
     console.groupEnd()
   }
-
   window.fbq(...args)
 }
 
@@ -84,7 +84,7 @@ const query = (...args) => {
  */
 const install = (Vue, options = {}) => {
   //
-  const { router, debug, excludeRoutes } = options
+  const { router, debug, excludeRoutes, appId } = options
 
   config.excludes = excludeRoutes || config.excludes
   config.debug = !!debug
@@ -106,6 +106,10 @@ const install = (Vue, options = {}) => {
 
   Vue.analytics.fbq = { init, event, query }
   Vue.prototype.$analytics.fbq = { init, event, query }
+
+  if (appId) {
+    Vue.analytics.fbq.init(appId)
+  }
 
   // Support for Vue-Router:
   if (router) {
