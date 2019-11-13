@@ -1,6 +1,6 @@
 {
   "name": "vue-analytics-facebook-pixel",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A small wrapper around Facebook Pixel API forked to support multiple pixels",
   "author": "TristanNovo <tristan@novok.ca>",
   "private": false,

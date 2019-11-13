@@ -89,8 +89,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  if (!_fbqEnabled()) return;
 
-	  window.fbqPixelId = appId;
-
 	  if (config.debug) {
 	    console.log('[Vue Facebook Pixel] Initializing app ' + appId);
 	  }
@@ -109,9 +107,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	    console.groupEnd();
 	  }
 
-	  if (window.fbqPixelId) {
-	    query('trackSingle', window.fbqPixelId, name, data);
+	  query('track', name, data);
+	};
+
+	var singleEvent = function singleEvent(appId, name) {
+	  var data = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+	  console.log(undefined);
+	  if (!_fbqEnabled()) return;
+
+	  if (config.debug) {
+	    console.groupCollapsed('[Vue Facebook Pixel] Track event \'' + name + '\'');
+	    console.log('With data: ' + data);
+	    console.groupEnd();
 	  }
+
+	  query('trackSingle', appId, name, data);
 	};
 
 	var query = function query() {
@@ -152,12 +163,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Vue.prototype.$analytics = {};
 	  }
 
-	  Vue.analytics.fbq = { init: init, event: event, query: query };
-	  Vue.prototype.$analytics.fbq = { init: init, event: event, query: query };
-
-	  if (appId) {
-	    Vue.analytics.fbq.init(appId);
-	  }
+	  Vue.analytics.fbq = { init: init, event: event, singleEvent: singleEvent, query: query, appId: appId };
+	  Vue.prototype.$analytics.fbq = { init: init, event: event, singleEvent: singleEvent, query: query, appId: appId };
 
 	  if (router) {
 	    var excludes = config.excludes;
@@ -171,7 +178,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return;
 	      }
 
-	      Vue.analytics.fbq.event('PageView');
+	      if (appId) {
+	        Vue.analytics.fbq.singleEvent(appId, 'PageView');
+	      } else {
+	        Vue.analytics.fbq.event('PageView');
+	      }
 	    });
 	  }
 	};

@@ -33,8 +33,6 @@ const _fbqEnabled = () => {
 const init = (appId, data = {}) => {
   if (!_fbqEnabled()) return
 
-  window.fbqPixelId = appId
-
   if (config.debug) {
     console.log(`[Vue Facebook Pixel] Initializing app ${appId}`)
   }
@@ -52,13 +50,31 @@ const event = (name, data = {}) => {
 
   if (config.debug) {
     console.groupCollapsed(`[Vue Facebook Pixel] Track event '${name}'`)
-    console.log(`With data: ${data}`)
+    console.log('With data: ', data)
     console.groupEnd()
   }
 
-  if (window.fbqPixelId) {
-    query('trackSingle', window.fbqPixelId, name, data)
+  query('track', name, data)
+}
+
+/**
+ * Event tracking to a single pixel
+ * @param  {String} appId
+ * @param  {String} name
+ * @param  {object} [data={}]
+ */
+const singleEvent = (appId, name, data = {}) => {
+  if (!_fbqEnabled()) return
+
+  if (config.debug) {
+    console.groupCollapsed(
+      `[Vue Facebook Pixel] Track event '${name}' to pixel '${appId}'`
+    )
+    console.log('With data: ', data)
+    console.groupEnd()
   }
+
+  query('trackSingle', appId, name, data)
 }
 
 /**
@@ -71,7 +87,7 @@ const query = (...args) => {
 
   if (config.debug) {
     console.groupCollapsed(`[Vue Facebook Pixel] Raw query`)
-    console.log(`With data: `, ...args)
+    console.log('With data: ', ...args)
     console.groupEnd()
   }
   window.fbq(...args)
@@ -104,12 +120,8 @@ const install = (Vue, options = {}) => {
   // 1. `Vue.analytics.fbq.init()`
   // 2. `this.$analytics.fbq.init()`
 
-  Vue.analytics.fbq = { init, event, query }
-  Vue.prototype.$analytics.fbq = { init, event, query }
-
-  if (appId) {
-    Vue.analytics.fbq.init(appId)
-  }
+  Vue.analytics.fbq = { init, event, singleEvent, query, appId }
+  Vue.prototype.$analytics.fbq = { init, event, singleEvent, query, appId }
 
   // Support for Vue-Router:
   if (router) {
@@ -120,7 +132,11 @@ const install = (Vue, options = {}) => {
         return
       }
 
-      Vue.analytics.fbq.event('PageView')
+      if (appId) {
+        Vue.analytics.fbq.singleEvent(appId, 'PageView')
+      } else {
+        Vue.analytics.fbq.event('PageView')
+      }
     })
   }
 }
