@@ -103,7 +103,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  if (config.debug) {
 	    console.groupCollapsed('[Vue Facebook Pixel] Track event \'' + name + '\'');
-	    console.log('With data: ' + data);
+	    console.log('With data: ', data);
 	    console.groupEnd();
 	  }
 
@@ -113,12 +113,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	var singleEvent = function singleEvent(appId, name) {
 	  var data = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-	  console.log(undefined);
 	  if (!_fbqEnabled()) return;
 
 	  if (config.debug) {
-	    console.groupCollapsed('[Vue Facebook Pixel] Track event \'' + name + '\'');
-	    console.log('With data: ' + data);
+	    console.groupCollapsed('[Vue Facebook Pixel] Track event \'' + name + '\' to pixel \'' + appId + '\'');
+	    console.log('With data: ', data);
 	    console.groupEnd();
 	  }
 

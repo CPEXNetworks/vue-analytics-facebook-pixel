@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 1.0.4
+
+- Removed unneeded console.log
+
 ## Version 1.0.3
 
 - Added singleEvent method
